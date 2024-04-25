@@ -4,7 +4,7 @@ import App from "src/App"; // Import the App component
 import { AuthProvider } from "src/context/Auth-Provider"; // Import AuthProvider for authentication context
 import { BrowserRouter, Route, Routes } from "react-router-dom"; // Import BrowserRouter and Route components for routing
 import { Auth0Provider } from "@auth0/auth0-react"; // Import Auth0Provider for Auth0 authentication
-
+import "./styling/index.css";
 // Create a new React root with ReactDOM.createRoot method, targeting the element with id "root"
 const root = ReactDOM.createRoot(document.getElementById("root"));
 

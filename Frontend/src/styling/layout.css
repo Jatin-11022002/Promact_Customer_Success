@@ -22,6 +22,7 @@
   width: 80%; /* Set width to 80% of the parent container */
   background-color: #fff; /* Set background color */
   height: 90vh; /* Set height to 90% of the viewport height */
+  overflow: auto;
 }
 
 /* Top bar container */
