@@ -16,6 +16,7 @@ const Table = ({
   sectionTab, // Current section tab
   allowedRoles = [], //Default Values for allowed roles
   allowedUsers = [],
+  unEditableColumn = [],
 }) => {
   // State variables for rows and columns of the table
   const [rows, setRows] = useState([]);
@@ -39,6 +40,7 @@ const Table = ({
       editable: false, // Flag for editing state
     }));
     setRows(newData);
+    console.log(unEditableColumn);
   }, [sectionTab]); // Dependency on sectionTab to trigger update when it changes
 
   // Function to validate input fields in a row
@@ -93,6 +95,7 @@ const Table = ({
           ...prevChangedRows,
           changedRow,
         ]); // Adds changed row to the list of changed table rows
+        return changedRow;
       }
       return row._id === id ? { ...row, editable: false } : row;
     });
@@ -195,7 +198,7 @@ const Table = ({
             <tr key={row._id}>
               {columns.map((column, cellIndex) => (
                 <td key={cellIndex}>
-                  {row.editable && column != "edited_by"
+                  {row.editable && !unEditableColumn.includes(column)
                     ? renderInputField(column, row)
                     : row[column]}
                 </td>

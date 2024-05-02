@@ -17,6 +17,7 @@ const getAuditHistory = async (req, res) => {
         comment: "",
         action_item: "",
         edited_by: "",
+        client_comment: "",
         _id: "",
         __v: "",
       },

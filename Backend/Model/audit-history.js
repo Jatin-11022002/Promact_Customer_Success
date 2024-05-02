@@ -40,6 +40,10 @@ const Audit_History_Schema = new mongoose.Schema({
     type: String,
     required: [true, "please provide action_item"],
   },
+  client_comment: {
+    type: String,
+    required: [true, "please provide client_comment"],
+  },
 });
 
 // Exporting the Audit_History model, using the defined schema, as a Mongoose model named "Audit_History"

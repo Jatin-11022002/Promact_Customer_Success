@@ -1,10 +1,11 @@
-import React, { useState, useEffect } from "react"; // Importing necessary dependencies from React
+import React, { useState, useEffect, useContext } from "react"; // Importing necessary dependencies from React
 import { Box } from "monday-ui-react-core"; // Importing Box component from Monday UI React Core library
 import "monday-ui-react-core/tokens"; // Importing Monday UI React Core tokens
 import Table from "src/components/utility-components/Table"; // Importing custom Table component
 import axios from "axios"; // Importing Axios for making HTTP requests
 import "src/styling/project-audit-history-section.css"; // Importing CSS styles for the component
 import { toast } from "react-toastify"; // Importing toast notifications for displaying messages
+import AuthContext from "src/context/Auth-Provider"; //Importing Context for Authentication
 
 // Project_Audit_History_Section component definition
 const Project_Audit_History_Section = ({ activeTab }) => {
@@ -12,6 +13,7 @@ const Project_Audit_History_Section = ({ activeTab }) => {
   const [auditHistory, setAuditHistory] = useState([]); // State for storing audit history data
   const [changedTableRows, setChangedTableRows] = useState([]); // State for storing changed table rows
   const [showSaveButton, setShowSaveButton] = useState(false); // State to control the visibility of the save button
+  const { auth } = useContext(AuthContext);
 
   // Base URL for API requests
   const BASE_URL = process.env.REACT_APP_BASE_URL;
@@ -41,6 +43,22 @@ const Project_Audit_History_Section = ({ activeTab }) => {
       // Displaying error message using toast notification
       toast.error("Some Error");
     }
+  };
+
+  const validateColumns = () => {
+    if (auth.role == "Auditor") {
+      return ["client_comment"];
+    } else if (auth.role == "Client") {
+      return [
+        "date_of_audit",
+        "reviewed_by",
+        "status",
+        "reviewed_section",
+        "comment",
+        "action_item",
+        "edited_by",
+      ];
+    } else return [];
   };
 
   // Function to fetch audit history data from the server
@@ -84,8 +102,9 @@ const Project_Audit_History_Section = ({ activeTab }) => {
             defaultValues={{
               project_id: auditHistory[0].project_id, // Set project_id based on the first item in auditHistory array
             }}
+            unEditableColumn={[...validateColumns()]}
             // Define roles allowed to access this table
-            allowedRoles={["Auditor"]}
+            allowedRoles={["Auditor", "Client"]}
             // Identifier for the table section
             sectionTab={"audit_history"}
             // Function to control the visibility of the save button

@@ -84,6 +84,7 @@ const Project_Project_Updates_Section = ({ activeTab }) => {
       <Box className="escalation-matrix-table-container">
         {projectUpdates.length > 0 && (
           <Table
+          unEditableColumn={['edited_by']}
             allowedUsers={allowedUsers}
             defaultValues={{
               project_id: projectUpdates[0].project_id,

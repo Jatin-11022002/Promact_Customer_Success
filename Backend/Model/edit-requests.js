@@ -9,9 +9,13 @@ const Edit_Requests = new mongoose.Schema({
   project_id: {
     type: String,
   },
-  status: {
+  manager_approval: {
     type: String,
-    default: "pending",
+    default:"pending"
+  },
+  admin_approval: {
+    type: String,
+    default:"pending"
   },
   user_id: {
     type: String,

@@ -47,7 +47,7 @@ const Project_Resources_Section = ({ activeTab }) => {
       );
       let { data: users } = allowedUsersResponse;
       users = users.data;
-      users = users.filter((user) => user.status == "approved");
+      users = users.filter((user) => user.admin_approval == "approved");
 
       setAllowedUsers(() => {
         return users.map((user) => {

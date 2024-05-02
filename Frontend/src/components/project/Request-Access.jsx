@@ -24,7 +24,8 @@ const RequestAccess = () => {
         _id: uuidv4(),
         user_id: user.sub,
         project_id,
-        status: "pending",
+        admin_approval: "pending",
+        manager_approval: "pending",
         user: {
           name: user.name,
           role: auth.role,
@@ -37,15 +38,19 @@ const RequestAccess = () => {
         [user_request]
       );
       setEditRequests([user_request]);
-      const { data } = await response.json();
+      toast.success("Request Sent Successfully");
+      //console.log(response);
     } catch (error) {
+      //console.log(error);
       toast.error("Error while Creating Edit Request");
     }
   };
 
   const fetchUserRequest = async () => {
     try {
-      const response = await axios.get(`${BASE_URL}/user-edit-request/${user.sub}`);
+      const response = await axios.get(
+        `${BASE_URL}/user-edit-request/${user.sub}`
+      );
       const { data: requests } = response;
       setEditRequests(requests.data);
     } catch (error) {
@@ -74,12 +79,17 @@ const RequestAccess = () => {
     }
   }, []);
 
-  const handleRequestStatus = async (updatedStatus, request_id) => {
+  const handleRequestStatus = async (
+    roleApproval,
+    updatedStatus,
+    request_id
+  ) => {
     try {
       let updatedRequest = {};
       const updatedRequests = editRequests.map((request) => {
         if (request._id == request_id) {
-          updatedRequest = { ...request, status: updatedStatus };
+          updatedRequest = { ...request };
+          updatedRequest[roleApproval] = updatedStatus;
           return updatedRequest;
         } else {
           return request;
@@ -99,27 +109,30 @@ const RequestAccess = () => {
   };
 
   const handleEditAccessMessage = () => {
-    switch (editRequests[0].status) {
-      case "approved":
-        return (
-          <div className="edit-access-message">
-            Your request for Edit Access was Approved
-          </div>
-        );
-
-      case "rejected":
-        return (
-          <div className="edit-access-message">
-            Your request for Edit Access was not Approved
-          </div>
-        );
-
-      default:
-        return (
-          <div className="edit-access-message">
-            You have applied for Edit Access
-          </div>
-        );
+    if (
+      editRequests[0].admin_approval == "approved" &&
+      editRequests[0].manager_approval == "approved"
+    ) {
+      return (
+        <div className="edit-access-message">
+          Your request for Edit Access was Approved
+        </div>
+      );
+    } else if (
+      editRequests[0].admin_approval == "rejected" ||
+      editRequests[0].manager_approval == "rejected"
+    ) {
+      return (
+        <div className="edit-access-message">
+          Your request for Edit Access was not Approved
+        </div>
+      );
+    } else {
+      return (
+        <div className="edit-access-message">
+          You have applied for Edit Access
+        </div>
+      );
     }
   };
 
@@ -141,26 +154,101 @@ const RequestAccess = () => {
               <td>{request.user.email}</td>
               <td>{request.user.role}</td>
               <td className="table-action-button-container">
-                <button
-                  className={`approve-button ${
-                    request.status == "rejected" ? "disable-button" : ""
-                  } ${request.status == "approved" ? "hide-hover" : ""}`}
-                  disabled={
-                    request.status == "rejected" || request.status == "approved"
-                  }
-                  onClick={() => handleRequestStatus("approved", request._id)}
-                >
-                  <FaCheck />
-                </button>
-                <button
-                  className={`reject-button ${
-                    request.status == "approved" ? "disable-button" : ""
-                  }${request.status == "rejected" ? "hide-hover" : ""}`}
-                  disabled={request.status == "approved"}
-                  onClick={() => handleRequestStatus("rejected", request._id)}
-                >
-                  <RxCross2 />
-                </button>
+                {auth.role == "Manager" ? (
+                  <>
+                    <button
+                      className={`approve-button ${
+                        request.manager_approval == "rejected"
+                          ? "disable-button"
+                          : ""
+                      } ${
+                        request.manager_approval == "approved"
+                          ? "hide-hover"
+                          : ""
+                      }`}
+                      disabled={
+                        request.manager_approval == "rejected" ||
+                        request.manager_approval == "approved"
+                      }
+                      onClick={() =>
+                        handleRequestStatus(
+                          "manager_approval",
+                          "approved",
+                          request._id
+                        )
+                      }
+                    >
+                      <FaCheck />
+                    </button>
+                    <button
+                      className={`reject-button ${
+                        request.manager_approval == "approved"
+                          ? "disable-button"
+                          : ""
+                      }${
+                        request.manager_approval == "rejected"
+                          ? "hide-hover"
+                          : ""
+                      }`}
+                      disabled={request.manager_approval == "approved"}
+                      onClick={() =>
+                        handleRequestStatus(
+                          "manager_approval",
+                          "rejected",
+                          request._id
+                        )
+                      }
+                    >
+                      <RxCross2 />
+                    </button>
+                  </>
+                ) : request.manager_approval == "approved" ? (
+                  <>
+                    <button
+                      className={`approve-button ${
+                        request.admin_approval == "rejected"
+                          ? "disable-button"
+                          : ""
+                      } ${
+                        request.admin_approval == "approved" ? "hide-hover" : ""
+                      }`}
+                      disabled={
+                        request.admin_approval == "rejected" ||
+                        request.admin_approval == "approved"
+                      }
+                      onClick={() =>
+                        handleRequestStatus(
+                          "admin_approval",
+                          "approved",
+                          request._id
+                        )
+                      }
+                    >
+                      <FaCheck />
+                    </button>
+                    <button
+                      className={`reject-button ${
+                        request.admin_approval == "approved"
+                          ? "disable-button"
+                          : ""
+                      }${
+                        request.admin_approval == "rejected" ? "hide-hover" : ""
+                      }`}
+                      disabled={request.admin_approval == "approved"}
+                      onClick={() =>
+                        handleRequestStatus(
+                          "admin_approval",
+                          "rejected",
+                          request._id
+                        )
+                      }
+                    >
+                      <RxCross2 />
+                    </button>
+                  </>
+                ) : (
+                  <label>Awaiting Manager's Approval</label>
+                )}
               </td>
             </tr>
           ))}
